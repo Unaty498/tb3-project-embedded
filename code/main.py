@@ -12,6 +12,9 @@ password = 'Mat2004Dau'
 #Initialisation de la Led
 led = Pin(27, Pin.OUT)
 
+#Initialistion de la serrure (c'est en réalité avec le transistor qu'on communique)
+#serrure = Pin(13, Pin.OUT)
+
 #Initialisation de l'écran
 i2c = I2C(0, scl=Pin(22), sda=Pin(23))
 oled = ssd1306.SSD1306_I2C(128, 32, i2c)
@@ -36,9 +39,6 @@ if internet.connect_wifi(SSID, password):
         (statut, tag_type) = reader.request(reader.REQIDL)
 
         if statut == reader.OK:
-            oled.fill(0)
-            oled.text("Badge detecte!", 10, 10)
-            oled.show()
             (statut, uid) = reader.anticoll()
             if statut == reader.OK:
                 acces = internet.demander_acces(uid, porte)
@@ -46,6 +46,7 @@ if internet.connect_wifi(SSID, password):
                     verrou.ouvrir_porte(led, oled)
                 else :#Si l'accès est refusé, on affiche un message de refus et on fait clignoter la led
                     verrou.refuser_acces(led, oled)
+                    
 else :#Si on arrive pas à se connecter à internet, il sera de toute façon impossible de savoir si l'acces est autorisé
     oled.text("Erreur Wifi", 0, 0)
     oled.text("Arret...", 0, 12)

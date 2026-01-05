@@ -2,6 +2,7 @@ from machine import Pin
 import time
 
 def ouvrir_porte(led, ecran):
+    #serrure.value(1) #Pour ouvrir la porte (il faudrait passer la serrure en paramètre de la fonction)
     led.value(1)
     ecran.fill(0)
     ecran.text("Acces autorise", 0, 15)
@@ -9,6 +10,7 @@ def ouvrir_porte(led, ecran):
     time.sleep(3)
 
 def fermer_porte(led, ecran):
+    #serrure.value(0) #Pour fermer la porte (il faudrait passer serrure en paramètre de la fonction)
     led.value(0)
     ecran.fill(0)
     ecran.text("Bonjour!", 0, 15)

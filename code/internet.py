@@ -26,7 +26,6 @@ def connect_wifi(SSID, password):
 
 def demander_acces(badge_number, door_id):
     url = "/api/locks/verify-access"
-    #reponse = urequests.request("POST", url, data={"badgeNumber":badge_number,"doorDeviceId":door_id})
-    donnees = {'result' : "GRANTEd" , 'message' : "Test"} 
-    #donnees = reponse.json()
+    reponse = urequests.request("POST", url, data={"badgeNumber":badge_number,"doorDeviceId":door_id}) 
+    donnees = reponse.json()
     return donnees['result']== "GRANTED"
