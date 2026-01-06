@@ -162,10 +162,12 @@ class MFRC522:
         buf = [0x93, 0x70] + uid[:4]
         buf += [self._crc(buf[:6])[0], self._crc(buf[:6])[1]] # Checksum
         (status, backData, backLen) = self._tocard(0x0C, buf)
-        if (status == self.OK) and (backLen == 0x18) and (backData[0] == 0x08):
-            return self.OK
+        
+        # On verifie juste que la communication est OK et qu'on a recu le SAK (24 bits = 3 octets avec CRC)
+        if (status == self.OK) and (backLen == 0x18):
+            return self.OK, backData[0] # Renvoie (Status, SAK)
         else:
-            return self.ERR
+            return self.ERR, 0
 
     def auth(self, mode, addr, sect, ser):
         return self._tocard(0x0E, [mode, addr] + sect + ser[:4])[0]

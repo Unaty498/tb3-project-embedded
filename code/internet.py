@@ -4,7 +4,6 @@ import time
 import ntptime
 import urequests
 import json
-import ssd1306
 
 def connect_wifi(SSID, password):
     wlan = network.WLAN(network.STA_IF)

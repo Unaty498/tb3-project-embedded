@@ -1,9 +1,9 @@
-from machine import Pin, SPI, I2C
-from mfrc522 import MFRC522
+from machine import Pin, I2C
 import time
 import ssd1306
 import internet
 import verrou
+import lecteur
 
 #Initialisation des variables pour la connexion internet
 SSID = 'MefMD'
@@ -21,10 +21,7 @@ oled = ssd1306.SSD1306_I2C(128, 32, i2c)
 oled.fill(0)
 
 #Initialisation du lecteur
-spi = SPI(2, baudrate=1000000, polarity=0, phase=0, sck=Pin(5), mosi=Pin(18), miso=Pin(19))
-reader = MFRC522(spi=spi, gpioRst=14, gpioSda=33)
-
-version = reader._rreg(0x37)
+lecteur_badge = lecteur.LecteurBadge()
 
 porte = 1
 
@@ -36,17 +33,27 @@ if internet.connect_wifi(SSID, password):
     while True:
         verrou.fermer_porte(led, oled)
         led.value(0)
-        (statut, tag_type) = reader.request(reader.REQIDL)
+        
+        badge_number = lecteur_badge.lire()
 
-        if statut == reader.OK:
-            (statut, uid) = reader.anticoll()
-            if statut == reader.OK:
-                acces = internet.demander_acces(uid, porte)
-                if acces:#Si l'acces est autorisé, on ouvre la porte, on affiche un message d'accès et on allume la led
-                    verrou.ouvrir_porte(led, oled)
-                else :#Si l'accès est refusé, on affiche un message de refus et on fait clignoter la led
-                    verrou.refuser_acces(led, oled)
-                    
+        if badge_number:
+            oled.fill(0)
+            oled.text("Badge detecte!", 10, 10)
+            oled.show()
+            
+            oled.fill(0)
+            oled.text("Verif: " + badge_number, 0, 0)
+            oled.show()
+            
+            acces = internet.demander_acces(badge_number, porte)
+            if acces:
+                verrou.ouvrir_porte(led, oled)
+            else:
+                verrou.refuser_acces(led, oled)
+        
+        # Petite pause pour ne pas surcharger le processeur
+        time.sleep(0.1)
+
 else :#Si on arrive pas à se connecter à internet, il sera de toute façon impossible de savoir si l'acces est autorisé
     oled.text("Erreur Wifi", 0, 0)
     oled.text("Arret...", 0, 12)
