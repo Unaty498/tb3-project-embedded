@@ -27,11 +27,18 @@ Cela devrait vous donner à peu près le branchement suivant :
 
 N'hésitez pas à brancher le lecteur RFC au breadboard pour raccorder ensuite à l'ESP32!
 
-Branchez enfin l'écran oled à l'ESP32 (il est fait pour se brancher directement sur l'ESP, "par dessus")
+Branchez l'écran oled à l'ESP32 (il est fait pour se brancher directement sur l'ESP, "par dessus")
+
+Enfin, connectez l'ESP32 à votre PC via USB
 
 # Utilisation
 
-L'ESP 32 doit être connecté à internet pour que tout fonctionne (le programme se mettra automatiquement en erreur sinon). Vous devez donc modifier les variables SSID et password qui se trouvent en haut du fichier main. Vous devez également modifier la variable ip_request et la remplir avec
+L'ESP 32 doit être connecté à internet pour que tout fonctionne (le programme se mettra automatiquement en erreur sinon). Vous devez donc modifier les variables SSID et password qui se trouvent en haut du fichier main. Vous devez également modifier la variable ip_request et la remplir avec la bonne ip (ce doit etre la même que celle que vous devez remplir dans la partie mobile).
+
+Une fois cela fait, vous pouvez injecter le code dans l'ESP32 (pensez à injecter les librairies). Si vous rencontrez une erreur de type "flash read err", rééssayez en débranchant la broche RST du lecteur (elle fait parfois planter l'ESP au démarrage) et rebranchez là après
+que l'ESP32 ait démarré.
+
+Vous pouvez alors éxécuter le code. Pssez un badge ou un téléphone dont le NFC est activé près du lecteur, il devrait le repérer et afficher "Accès autorisé" sur l'écran si le badge est reconnu. Vous pouvez simuler 3 portes différentes en appuyant sur les boutons A, B et C de l'écran (la porte par défaut est la A).
 
 # Problème technique avec la serrure
 
