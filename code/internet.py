@@ -23,8 +23,12 @@ def connect_wifi(SSID, password):
     print(f"Adresse IP de l'ESP32 : {ip_esp32}")
     return True
 
-def demander_acces(badge_number, door_id):
-    url = "/api/locks/verify-access"
-    reponse = urequests.request("POST", url, data={"badgeNumber":badge_number,"doorDeviceId":door_id}) 
-    donnees = reponse.json()
-    return donnees['result']== "GRANTED"
+def demander_acces(ip, badge_number, door_id):
+    url = "http://"+ip+"/api/locks/verify-access"
+    headers = {'Content-Type': 'application/json'}
+    data = json.dumps({"badgeNumber": badge_number, "doorDeviceId": door_id})
+    print(data)
+    response = urequests.post(url, headers=headers, data=data) 
+    print(response)
+    donnees = response.json()
+    return donnees['result']

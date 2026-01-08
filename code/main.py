@@ -8,9 +8,16 @@ import lecteur
 #Initialisation des variables pour la connexion internet
 SSID = 'MefMD'
 password = 'Mat2004Dau'
+ip_request = "10.0.0.1"
 
 #Initialisation de la Led
 led = Pin(27, Pin.OUT)
+
+#initialisation des boutons pour simuler le changement de porte
+btn_a = Pin(15, Pin.IN, Pin.PULL_UP)
+btn_b = Pin(32, Pin.IN, Pin.PULL_UP)
+btn_c = Pin(14, Pin.IN, Pin.PULL_UP)
+
 
 #Initialistion de la serrure (c'est en réalité avec le transistor qu'on communique)
 #serrure = Pin(13, Pin.OUT)
@@ -23,7 +30,14 @@ oled.fill(0)
 #Initialisation du lecteur
 lecteur_badge = lecteur.LecteurBadge()
 
-porte = 1
+porte = "DOOR-MAIN-001"
+def set_door(door):
+    global porte
+    porte = door
+btn_a.irq(trigger=Pin.IRQ_FALLING, handler=lambda _: set_door(verrou.porte_a()))
+btn_b.irq(trigger=Pin.IRQ_FALLING, handler=lambda _: set_door(verrou.porte_b()))
+btn_c.irq(trigger=Pin.IRQ_FALLING, handler=lambda _: set_door(verrou.porte_c()))
+    
 
 if internet.connect_wifi(SSID, password):
     oled.fill(0)
@@ -45,11 +59,11 @@ if internet.connect_wifi(SSID, password):
             oled.text("Verif: " + badge_number, 0, 0)
             oled.show()
             
-            acces = internet.demander_acces(badge_number, porte)
-            if acces:
+            resultat = internet.demander_acces(ip_request, badge_number, porte)
+            if resultat == "GRANTED":
                 verrou.ouvrir_porte(led, oled)
             else:
-                verrou.refuser_acces(led, oled)
+                verrou.refuser_acces(led, oled, resultat)
         
         # Petite pause pour ne pas surcharger le processeur
         time.sleep(0.1)
