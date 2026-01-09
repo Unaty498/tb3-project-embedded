@@ -87,11 +87,11 @@ class MFRC522:
 		if cmd == 0x0C:
 			self._sflags(0x0D, 0x80)
 
-		i = 2000
+		i = 20000 
 		while True:
 			n = self._rreg(0x04)
 			i -= 1
-			if ~((i != 0) and ~(n & 0x01) and ~(n & wait_irq)):
+			if not ((i != 0) and ~(n & 0x01) and ~(n & wait_irq)):
 				break
 
 		self._cflags(0x0D, 0x80)

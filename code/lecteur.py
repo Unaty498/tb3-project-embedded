@@ -7,6 +7,14 @@ class LecteurBadge:
         # Configuration des pins SPI pour le lecteur RFID
         #self.spi = SPI(2, baudrate=100000, polarity=0, phase=0, sck=Pin(5), mosi=Pin(18), miso=Pin(19))
         self.reader = MFRC522(sck=5, mosi=18, miso=19, rst=12, cs=33)
+        
+        # Ajustement du Timer pour supporter les délais Android HCE
+        # Par defaut la lib met ~15ms, ce qui est trop court pour un telephone.
+        # On augmente à environ 200-300ms.
+        # Timer freq = 13.56MHz / (2*TPre + 1). TPre=3390 => ~2kHz (0.5ms per tick)
+        # 0x2C est Reload High, 0x2D est Reload Low.
+        self.reader._wreg(0x2C, 0x03) # High byte 
+        self.reader._wreg(0x2D, 0xE8) # Low byte (Total ~1000 ticks = 500ms)
 
     def lire(self):
         """
@@ -65,7 +73,7 @@ class LecteurBadge:
                 
                 # Fonction interne pour envoyer des données et gérer le WTX (Waiting Time Extension)
                 def send_and_wait(frame_data):
-                    max_retries = 10
+                    max_retries = 100 # Augmenté pour supporter les negociations longues
                     current_frame = frame_data
                     
                     while max_retries > 0:
